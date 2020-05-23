@@ -143,24 +143,48 @@ Q12='''
     '''
 
 Q13='''
-    SELECT 
-        (SELECT 
-            captain
-        FROM 
-            MatchCaptain
-        WHERE
-            MatchCaptain.Team_id=MatchTeamDetails.Team_id
-        ) as captain,
-        COUNT(win_lose) as no_of_wins
+    SELECT
+        captain,COUNT(win_lose)
     FROM
-        MatchTeamDetails
+        MatchCaptain
+        INNER JOIN MatchTeamDetails ON (
+                            MatchCaptain.match_no=MatchTeamDetails.match_no AND
+                            MatchCaptain.Team_id=MatchTeamDetails.Team_id
+                            )
     WHERE
         win_lose="W"
-    GROUP BY 
-        team_id
+    GROUP BY
+        captain
     ORDER BY
         COUNT(win_lose) DESC;
     '''
+        
+
+
+
+
+
+
+
+# Q13='''
+#     SELECT 
+#         (SELECT 
+#             captain
+#         FROM 
+#             MatchCaptain
+#         WHERE
+#             MatchCaptain.Team_id=MatchTeamDetails.Team_id
+#         ) as captain,
+#         COUNT(win_lose) as no_of_wins
+#     FROM
+#         MatchTeamDetails
+#     WHERE
+#         win_lose="W"
+#     GROUP BY 
+#         team_id
+#     ORDER BY
+#         COUNT(win_lose) DESC;
+#     '''
     
 
 

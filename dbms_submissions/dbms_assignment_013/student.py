@@ -13,7 +13,13 @@ class Student:
         self.student_id = None
         self.age = age
         self.score = score
-    
+    def __repr__(self):
+        return "Student(student_id={0}, name={1}, age={2}, score={3})".format(
+            self.student_id,
+            self.name,
+            self.age,
+            self.score)
+            
     @classmethod
     def get(cls,**kwargs):
         for key,value in kwargs.items():
@@ -74,45 +80,37 @@ class Student:
     @classmethod
     def filter(cls,**kwargs):
         for key,value in kwargs.items():
-            if key in ["student_id","name","age","score"]:
-                sql_query='''select * from Student where {}="{}"'''.format(key,value)
+            field=key.split('__')
+            if field[0] not in ["student_id","name","age","score"]:
+                raise InvalidField
                 
-            elif key in ["student_id__lt","age__lt","score__lt"]:
-                field=key.split('__')
+            if len(field)==1:
+                if field[0] in ["student_id","name","age","score"]:
+                    sql_query='''select * from Student where {}="{}"'''.format(key,value)
+                    
+            elif field[1]=="lt":
                 sql_query='''select * from Student where {}<{}'''.format(field[0],value)
                 
-            elif key in ["student_id__lte","age__lte","score__lte"]:
-                field=key.split('__')
+            elif field[1]=="lte":
                 sql_query='''select * from Student where {}<={}'''.format(field[0],value)
                 
-            elif key in ["student_id__gt","age__gt","score__gt"]:
-                field=key.split('__')
+            elif field[1]=="gt":
                 sql_query='''select * from Student where {}>{}'''.format(field[0],value)
                 
-            elif key in ["student_id__gte","age__gte","score__gte"]:
-                field=key.split('__')
+            elif field[1]=="gte":
                 sql_query='''select * from Student where {}>={}'''.format(field[0],value)
                 
-            elif key in ["student_id__neq","age__neq","score__neq","name__neq"]:
-                field=key.split('__')
+            elif field[1]=="neq":
                 sql_query='''select * from Student where {}!="{}"'''.format(field[0],value)
                 
-            elif key in ["student_id__in","age__in","score__in","name__in"]:
-                field=key.split('__')
+            elif field[1]=="in":
                 p=tuple(value)
                 sql_query='''select * from Student where {} in {}'''.format(field[0],p)
-            
-            elif key in ["student_id__in","age__in","score__in"]:
-                field=key.split('__')
-                sql_query='''select * from Student where ? in ?''',(field[0],(value,))
                 
-            elif key in ["name__contains"]:
-                field=key.split('__')
+            elif field[1]=="contains":
                 sql_query='''select * from Student where name like "%{}%"'''.format(value)
-            else:
-                raise InvalidField
+                
             
-        
         ans=read_data(sql_query)
         li=[]
         for i in range(len(ans)):
@@ -121,7 +119,6 @@ class Student:
             li.append(object)
         
         return li
-        
         
 def write_data(sql_query):
 	import sqlite3
@@ -140,4 +137,3 @@ def read_data(sql_query):
 	ans= crsr.fetchall()  
 	connection.close() 
 	return ans
-	

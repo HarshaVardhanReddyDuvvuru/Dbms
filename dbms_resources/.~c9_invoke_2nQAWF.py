@@ -1,0 +1,1 @@
+class Movie(id=None,name=None,year=None,rank=None):
